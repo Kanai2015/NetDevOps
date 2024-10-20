@@ -107,45 +107,93 @@ resource "aws_security_group" "allow_ssh_london" {
 
 }
 
-# # EC2 Instances
-# data "aws_ami" "amazon_linux_2" {
-#   for_each = toset(["mumbai", "sydney", "london"])
+# EC2 Instances
+data "aws_ami" "amazon_linux_2_mumbai" {
+  most_recent = true
+  owners      = ["amazon"]
 
-#   most_recent = true
-#   owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+   provider = aws.mumbai
 
-#   filter {
-#     name   = "name"
-#     values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-#   }
+}
 
-# #   provider = each.key == "london" ? aws.london : (
-# #     each.key == "sydney" ? aws.sydney : aws.mumbai
-# #   )
-# }
+data "aws_ami" "amazon_linux_2_sydney" {
+  most_recent = true
+  owners      = ["amazon"]
 
-# resource "aws_instance" "ec2_instances" {
-#   for_each = {
-#     # mumbai_dev  = { provider = aws.mumbai, subnet = aws_subnet.mumbai_dev.id, sg = aws_security_group.allow_ssh["mumbai_dev"].id }
-#     # mumbai_prod = { provider = aws.mumbai, subnet = aws_subnet.mumbai_prod.id, sg = aws_security_group.allow_ssh["mumbai_prod"].id }
-#     # sydney_dev  = { provider = aws.sydney, subnet = aws_subnet.sydney_dev.id, sg = aws_security_group.allow_ssh["sydney_dev"].id }
-#     # sydney_prod = { provider = aws.sydney, subnet = aws_subnet.sydney_prod.id, sg = aws_security_group.allow_ssh["sydney_prod"].id }
-#     # london_net  = { provider = aws.london, subnet = aws_subnet.london_net.id, sg = aws_security_group.allow_ssh["london_net"].id }
-#     mumbai_dev  = { subnet = aws_subnet.mumbai_dev.id, sg = aws_security_group.allow_ssh["mumbai_dev"].id }
-#     mumbai_prod = { subnet = aws_subnet.mumbai_prod.id, sg = aws_security_group.allow_ssh["mumbai_prod"].id }
-#     sydney_dev  = { subnet = aws_subnet.sydney_dev.id, sg = aws_security_group.allow_ssh["sydney_dev"].id }
-#     sydney_prod = { subnet = aws_subnet.sydney_prod.id, sg = aws_security_group.allow_ssh["sydney_prod"].id }
-#     london_net  = { subnet = aws_subnet.london_net.id, sg = aws_security_group.allow_ssh["london_net"].id }
-#   }
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+   provider = aws.sydney
 
-# #   provider      = each.value.provider
-#   ami           = data.aws_ami.amazon_linux_2[split("_", each.key)[0]].id
-#   instance_type = "t2.micro"
-#   subnet_id     = each.value.subnet
+}
 
-#   vpc_security_group_ids = [each.value.sg]
+data "aws_ami" "amazon_linux_2_london" {
+  most_recent = true
+  owners      = ["amazon"]
 
-#   tags = {
-#     Name = "EC2-${each.key}"
-#   }
-# }
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+   provider = aws.london
+
+}
+
+resource "aws_instance" "ec2_instances_mumbai" {
+  for_each = {
+    
+    mumbai_dev  = { subnet = aws_subnet.mumbai_dev.id, sg = aws_security_group.allow_ssh_mumbai["mumbai_dev"].id }
+    mumbai_prod = { subnet = aws_subnet.mumbai_prod.id, sg = aws_security_group.allow_ssh_mumbai["mumbai_prod"].id }
+  }
+
+  provider      = aws.mumbai
+  ami           = data.aws_ami.amazon_linux_2_mumbai.id
+  instance_type = "t2.micro"
+  subnet_id     = each.value.subnet
+
+  vpc_security_group_ids = [each.value.sg]
+
+  tags = {
+    Name = "EC2-${each.key}"
+  }
+}
+
+resource "aws_instance" "ec2_instances_sydney" {
+  for_each = {
+    sydney_dev  = { subnet = aws_subnet.sydney_dev.id, sg = aws_security_group.allow_ssh_sydney["sydney_dev"].id }
+    sydney_prod = { subnet = aws_subnet.sydney_prod.id, sg = aws_security_group.allow_ssh_sydney["sydney_prod"].id }
+  }
+
+  provider      = aws.sydney
+  ami           = data.aws_ami.amazon_linux_2_sydney.id
+  instance_type = "t2.micro"
+  subnet_id     = each.value.subnet
+
+  vpc_security_group_ids = [each.value.sg]
+
+  tags = {
+    Name = "EC2-${each.key}"
+  }
+}
+
+resource "aws_instance" "ec2_instances_london" {
+  for_each = {
+    london_net  = { subnet = aws_subnet.london_net.id, sg = aws_security_group.allow_ssh_london["london_net"].id }
+  }
+
+  provider      = aws.london
+  ami           = data.aws_ami.amazon_linux_2_london.id
+  instance_type = "t2.micro"
+  subnet_id     = each.value.subnet
+
+  vpc_security_group_ids = [each.value.sg]
+
+  tags = {
+    Name = "EC2-${each.key}"
+  }
+}
