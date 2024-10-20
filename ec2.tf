@@ -14,17 +14,18 @@ provider "aws" {
 # Security Groups
 resource "aws_security_group" "allow_ssh" {
   for_each = {
-    mumbai_dev  = {vpcId=aws_vpc.mumbai_dev.id,pro="mumbai"}
-    mumbai_prod = {vpcId=aws_vpc.mumbai_prod.id,pro="mumbai"}
-    sydney_dev  = {vpcId=aws_vpc.sydney_dev.id,pro="sydney"}
-    sydney_prod = {vpcId=aws_vpc.sydney_prod.id,pro="sydney"}
-    london_net  = {vpcId=aws_vpc.london_net.id,pro="london"}
+    mumbai_dev  = {vpcId=aws_vpc.mumbai_dev.id,pro=".mumbai"}
+    mumbai_prod = {vpcId=aws_vpc.mumbai_prod.id,pro=".mumbai"}
+    sydney_dev  = {vpcId=aws_vpc.sydney_dev.id,pro=".sydney"}
+    sydney_prod = {vpcId=aws_vpc.sydney_prod.id,pro=".sydney"}
+    london_net  = {vpcId=aws_vpc.london_net.id,pro=".london"}
   }
 
   name        = "allow_ssh_${each.key}"
   description = "Allow SSH inbound traffic"
   vpc_id      = each.value.vpcId
-  provider    = "aws.${each.value.pro}"
+  # provider    = "aws.${each.value.pro}"
+  provider    = aws[each.value.pro]
 
   ingress {
     description = "SSH from anywhere"
