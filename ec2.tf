@@ -1,16 +1,3 @@
-provider "aws" {
-    alias  = "mumbai"
-    region = "ap-south-1"
-} 
-provider "aws" {
-    alias  = "sydney"
-    region = "ap-southeast-2"
-  }
-provider "aws" {
-    alias  = "london"
-    region = "eu-west-2"
-  }
-
 # Security Groups
 resource "aws_security_group" "allow_ssh_mumbai" {
   for_each = {
@@ -18,16 +5,16 @@ resource "aws_security_group" "allow_ssh_mumbai" {
     mumbai_prod = {vpcId=aws_vpc.mumbai_prod.id}
   }
 
-  name        = "allow_ssh_${each.key}"
-  description = "Allow SSH inbound traffic"
+  name        = "allow_ping_${each.key}"
+  description = "Allow ICMP (ping) inbound traffic"
   vpc_id      = each.value.vpcId
   provider    = aws.mumbai
 
   ingress {
-    description = "SSH from anywhere"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
+    description = "ICMP from anywhere"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -39,7 +26,7 @@ resource "aws_security_group" "allow_ssh_mumbai" {
   }
 
   tags = {
-    Name = "Allow-SSH-${each.key}"
+    Name = "Allow-PING-${each.key}"
   }
 
 }
@@ -51,15 +38,15 @@ resource "aws_security_group" "allow_ssh_sydney" {
   }
 
   name        = "allow_ssh_${each.key}"
-  description = "Allow SSH inbound traffic"
+  description = "Allow PING inbound traffic"
   vpc_id      = each.value.vpcId
   provider    = aws.sydney
 
   ingress {
-    description = "SSH from anywhere"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
+    description = "ICMP from anywhere"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -71,7 +58,7 @@ resource "aws_security_group" "allow_ssh_sydney" {
   }
 
   tags = {
-    Name = "Allow-SSH-${each.key}"
+    Name = "Allow-PING-${each.key}"
   }
 
 }
@@ -82,15 +69,15 @@ resource "aws_security_group" "allow_ssh_london" {
   }
 
   name        = "allow_ssh_${each.key}"
-  description = "Allow SSH inbound traffic"
+  description = "Allow PING inbound traffic"
   vpc_id      = each.value.vpcId
   provider    = aws.london
 
   ingress {
-    description = "SSH from anywhere"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
+    description = "ICMP from anywhere"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -102,7 +89,7 @@ resource "aws_security_group" "allow_ssh_london" {
   }
 
   tags = {
-    Name = "Allow-SSH-${each.key}"
+    Name = "Allow-PING-${each.key}"
   }
 
 }
@@ -157,6 +144,7 @@ resource "aws_instance" "ec2_instances_mumbai" {
   subnet_id     = each.value.subnet
 
   vpc_security_group_ids = [each.value.sg]
+  iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
 
   tags = {
     Name = "EC2-${each.key}"
@@ -175,6 +163,7 @@ resource "aws_instance" "ec2_instances_sydney" {
   subnet_id     = each.value.subnet
 
   vpc_security_group_ids = [each.value.sg]
+  iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
 
   tags = {
     Name = "EC2-${each.key}"
@@ -192,6 +181,7 @@ resource "aws_instance" "ec2_instances_london" {
   subnet_id     = each.value.subnet
 
   vpc_security_group_ids = [each.value.sg]
+  iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
 
   tags = {
     Name = "EC2-${each.key}"

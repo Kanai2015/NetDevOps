@@ -35,7 +35,7 @@ resource "aws_networkmanager_core_network_policy_attachment" "policy" {
       },
       {
         name = "production"
-        isolate-attachments = true
+        isolate-attachments = false
         require-attachment-acceptance = true
       },
       {
@@ -49,21 +49,65 @@ resource "aws_networkmanager_core_network_policy_attachment" "policy" {
         action = "share"
         mode = "attachment-route"
         segment = "networking"
-        share-with = "*"
+        share-with = ["development", "production"]
+      },
+      {
+        action = "share"
+        mode = "attachment-route"
+        segment = "development"
+        share-with = ["networking"]
+      },
+      {
+        action = "share"
+        mode = "attachment-route"
+        segment = "production"
+        share-with = ["networking"]
       }
     ]
     attachment-policies = [
-      {
+  {
         rule-number = 100
         conditions = [
           {
-            type = "tag-exists"
-            key = "Segment"
+            type = "tag-value"
+            key = "Environment"
+            operator = "equals"
+            value = "development"
           }
         ]
         action = {
-          association-method = "tag"
-          tag-value-of-key = "Segment"
+          association-method = "constant"
+          segment = "development"
+        }
+      },
+      {
+        rule-number = 200
+        conditions = [
+          {
+            type = "tag-value"
+            key = "Environment"
+            operator = "equals"
+            value = "production"
+          }
+        ]
+        action = {
+          association-method = "constant"
+          segment = "production"
+        }
+      },
+      {
+        rule-number = 300
+        conditions = [
+          {
+            type = "tag-value"
+            key = "Environment"
+            operator = "equals"
+            value = "networking"
+          }
+        ]
+        action = {
+          association-method = "constant"
+          segment = "networking"
         }
       }
     ]
@@ -76,7 +120,7 @@ resource "aws_networkmanager_vpc_attachment" "mumbai_dev_attachment" {
   vpc_arn         = aws_vpc.mumbai_dev.arn
   subnet_arns     = [aws_subnet.mumbai_dev.arn]
   tags = {
-    Segment = "development"
+    Environment = "development"
   }
 }
 
@@ -86,7 +130,7 @@ resource "aws_networkmanager_vpc_attachment" "sydney_dev_attachment" {
   vpc_arn         = aws_vpc.sydney_dev.arn
   subnet_arns     = [aws_subnet.sydney_dev.arn]
   tags = {
-    Segment = "development"
+    Environment = "development"
   }
 }
 
@@ -97,7 +141,7 @@ resource "aws_networkmanager_vpc_attachment" "mumbai_prod_attachment" {
   vpc_arn         = aws_vpc.mumbai_prod.arn
   subnet_arns     = [aws_subnet.mumbai_prod.arn]
   tags = {
-    Segment = "production"
+    Environment = "production"
   }
 }
 
@@ -108,7 +152,7 @@ resource "aws_networkmanager_vpc_attachment" "sydney_prod_attachment" {
   vpc_arn         = aws_vpc.sydney_prod.arn
   subnet_arns     = [aws_subnet.sydney_prod.arn]
   tags = {
-    Segment = "production"
+    Environment = "production"
   }
 }
 
@@ -117,6 +161,6 @@ resource "aws_networkmanager_vpc_attachment" "london_net_attachment" {
   vpc_arn         = aws_vpc.london_net.arn
   subnet_arns     = [aws_subnet.london_net.arn]
   tags = {
-    Segment = "networking"
+    Environment = "networking"
   }
 }
