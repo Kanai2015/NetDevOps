@@ -146,6 +146,12 @@ resource "aws_route_table" "mumbai_dev" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.mumbai_dev.id
   }
+
+  route {
+    cidr_block         = "10.0.0.0/8"
+    core_network_arn   = aws_networkmanager_core_network.core_network.arn
+  }
+
   tags = {
     Name = "Mumbai-Dev-RT"
   }
@@ -158,6 +164,12 @@ resource "aws_route_table" "mumbai_prod" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.mumbai_prod.id
   }
+
+  route {
+    cidr_block         = "10.0.0.0/8"
+    core_network_arn   = aws_networkmanager_core_network.core_network.arn
+  }
+
   tags = {
     Name = "Mumbai-Prod-RT"
   }
@@ -170,6 +182,12 @@ resource "aws_route_table" "sydney_dev" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.sydney_dev.id
   }
+
+  route {
+    cidr_block         = "10.0.0.0/8"
+    core_network_arn   = aws_networkmanager_core_network.core_network.arn
+  }
+
   tags = {
     Name = "Sydney-Dev-RT"
   }
@@ -182,6 +200,12 @@ resource "aws_route_table" "sydney_prod" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.sydney_prod.id
   }
+
+  route {
+    cidr_block         = "10.0.0.0/8"
+    core_network_arn   = aws_networkmanager_core_network.core_network.arn
+  }
+
   tags = {
     Name = "Sydney-Prod-RT"
   }
@@ -194,6 +218,12 @@ resource "aws_route_table" "london_net" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.london_net.id
   }
+
+  route {
+    cidr_block         = "10.0.0.0/8"
+    core_network_arn   = aws_networkmanager_core_network.core_network.arn
+  }
+  
   tags = {
     Name = "London-Networking-RT"
   }
