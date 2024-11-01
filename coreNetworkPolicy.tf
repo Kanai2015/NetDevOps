@@ -124,7 +124,7 @@ resource "aws_networkmanager_vpc_attachment" "mumbai_dev_attachment" {
   }
 }
 
-# Create dev VPC attachments - Sydney
+# Create dev VPC attachments - Sydney region
 resource "aws_networkmanager_vpc_attachment" "sydney_dev_attachment" {
   core_network_id = aws_networkmanager_core_network.core_network.id
   vpc_arn         = aws_vpc.sydney_dev.arn
