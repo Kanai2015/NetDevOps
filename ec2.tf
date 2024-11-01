@@ -145,6 +145,7 @@ resource "aws_instance" "ec2_instances_mumbai" {
 
   vpc_security_group_ids = [each.value.sg]
   iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
+  associate_public_ip_address = true
 
   tags = {
     Name = "EC2-${each.key}"
@@ -164,6 +165,7 @@ resource "aws_instance" "ec2_instances_sydney" {
 
   vpc_security_group_ids = [each.value.sg]
   iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
+  associate_public_ip_address = true
 
   tags = {
     Name = "EC2-${each.key}"
@@ -182,7 +184,8 @@ resource "aws_instance" "ec2_instances_london" {
 
   vpc_security_group_ids = [each.value.sg]
   iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
-
+  associate_public_ip_address = true
+  
   tags = {
     Name = "EC2-${each.key}"
   }
